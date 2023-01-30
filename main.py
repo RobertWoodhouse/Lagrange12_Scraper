@@ -1,7 +1,8 @@
 '''
 Lagrange12 Web Scraper
 Author: Robert Woodhouse
-Last Modified: 29/01/2023
+Created: 25/01/2023
+Modified: 30/01/2023
 '''
 
 from selenium import webdriver
@@ -15,7 +16,7 @@ category = ("new-arrivals", "clothing", "shoes", "bags", "accessories", "jewels"
 product_list = []
 
 
-def cook_soup(url):
+def open_browser_soup(url):
     browser.get(url)
     return BeautifulSoup(browser.page_source, "html.parser")
 
@@ -30,12 +31,8 @@ browser.get("https://www.lagrange12.com/en_uk/"+gender[int(g_input)]+category[in
 '''
 
 # Hard Coded URL:
-soup = cook_soup("https://www.lagrange12.com/en_uk/men/shoes.html")
-
-#headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36'}
-
+soup = open_browser_soup("https://www.lagrange12.com/en_uk/men/shoes.html")
 result = soup.find('ol', class_='small-12 products list items product-items')
-#results = result.find_all('li', class_='medium-6 large-3 item product product-item small-6')
 results = result.find_all('li')
 
 links = []
@@ -43,13 +40,13 @@ links = []
 for res in results:
     links.append(res.find('a').get('href'))
 
-i = 0
+#i = 0
 
 for link in links:
-    soup = cook_soup(link)
+    soup = open_browser_soup(link)
     res = soup.find('div', class_="product-detail small-12 medium-offset-1 medium-11 large-offset-2 large-10")
     title_id = res.find_all('p', class_="title")
-    value = res.find('span', class_="price")
+    value = res.find('span', class_="price") #TODO stop json from changing char uni code
     brand = res.find('span', class_="base")
     description = res.find('div', class_="description").find('p') #TODO change to find_all list and seperate with /n
 
@@ -71,8 +68,8 @@ for link in links:
 
 product_json = json.dumps(product_list, indent=3)
 
-with open("lagrange_products.json", "w") as outfile:
-    outfile.write(product_json)
+with open("lagrange_products.json", "w") as file:
+    file.write(product_json)
 
 print(product_json)
 
@@ -80,8 +77,8 @@ browser.close()
 
 #TODO
 '''
-+ Go through links array, load pages of products and scrape info from them
-+ Scrape the following: div class="product-detail small-12 medium-offset-1 medium-11 large-offset-2 large-10"
+[+] Go through links array, load pages of products and scrape info from them
+[+] Scrape the following: div class="product-detail small-12 medium-offset-1 medium-11 large-offset-2 large-10"
 [+] product_name | p class="title"
 [+] sku | p class="title"
 [+] value | span class="price"
@@ -89,18 +86,15 @@ browser.close()
 [+] Description | div data-content-type="row" / div data-content-type="text"
 [+] category | {category var}
 [+] product_gender | {gender var}
-+ Save info to a List of Dictionaries
-- Convert from List of Dictionaries to SQL file
-'''
-
-'''
-- Scrape the first 100 available search results
-+ Generalize your code to allow searching for different locations/jobs
-+ Pick out information about the URL, job title, and job location
-+ Save the results to a file
-
-
-- Build web-scraping models using Python.
-- Gathering data from multiple sources and pulling it into a SQL database.
-- Collaborating with the Data Science team and preparing the data for their use, allowing
+[+] Save info to a List of Dictionaries
+[-] Convert from List of Dictionaries to SQL file
+[-] Scrape the first 100 available search results
+    > Build the code to fetch the first 100 search results. This means you will need to automatically navigate to multiple results pages
+    > Write functions that allow you to specify the job title, location, and amount of results as arguments
+[+] Generalize your code to allow searching for different locations/jobs
+[+] Pick out information about the URL, job title, and job location
+[+] Save the results to a file
+[-] Build web-scraping models using Python.
+[-] Gathering data from multiple sources and pulling it into a SQL database.
+[-] Collaborating with the Data Science team and preparing the data for their use, allowing
 '''
