@@ -2,7 +2,7 @@
 Lagrange12 Web Scraper
 Author: Robert Woodhouse
 Created: 25/01/2023
-Modified: 16/02/2023
+Modified: 18/02/2023
 '''
 
 from selenium import webdriver
@@ -16,7 +16,7 @@ gender = ("men/", "women/")
 category = ("new-arrivals", "clothing", "shoes", "bags", "accessories", "jewels", "objects")
 number_of_products = 0
 links = []
-product_list = []
+#product_list = []
 
 def open_browser_soup(url):
     browser.get(url)
@@ -34,7 +34,8 @@ browser.get("https://www.lagrange12.com/en_uk/"+gender[int(g_input)]+category[in
 '''
 
 def build_link_list(url, num_of_results):
-    count = 1
+    page_count = 1
+    category_url = url
     while(len(links) <= num_of_results):
         soup = open_browser_soup(url)
         result = soup.find('ol', class_='small-12 products list items product-items')
@@ -42,19 +43,18 @@ def build_link_list(url, num_of_results):
 
         for res in results:
             links.append(res.find('a').get('href'))
-            #print("Number of links = " + str(len(links)) + " out of " + str(num_of_results))
+            print("Number of links = " + str(len(links)) + " out of " + str(num_of_results))
+
             if len(links) == num_of_results:
-                break
+                return
 
-        if len(links) == num_of_results:
-            break
-        else:
-            count += 1
-            url = url + "?p=" + str(count)
-            #print(url)
+        page_count += 1
+        url = category_url + "?p=" + str(page_count)
+        print(url)
 
-# Hard Coded URL
-build_link_list('https://www.lagrange12.com/en_uk/men/shoes.html', num_of_results=2)
+
+# Hard Coded Test URL
+build_link_list('https://www.lagrange12.com/en_uk/men/shoes.html', num_of_results=43)
 
 product_dict = {"name": [],
                 "sku": [],
@@ -63,7 +63,7 @@ product_dict = {"name": [],
                 "description": []}
 
 for link in links:
-    #print(link)
+    print(link)
     soup = open_browser_soup(link)
     res = soup.find('div', class_="product-detail small-12 medium-offset-1 medium-11 large-offset-2 large-10")
     title_id = res.find_all('p', class_="title")
@@ -85,27 +85,3 @@ df.to_csv('l12.csv', index=False)
 #df.to_sql(name='l12.sql', con=sqlite3.Connection)
 
 browser.close()
-
-#TODO
-'''
-[+] Go through links array, load pages of products and scrape info from them
-[+] Scrape the following: div class="product-detail small-12 medium-offset-1 medium-11 large-offset-2 large-10"
-[+] product_name | p class="title"
-[+] sku | p class="title"
-[+] value | span class="price"
-[+] product_brand | span class="base"
-[+] Description | div data-content-type="row" / div data-content-type="text"
-[+] category | {category var}
-[+] product_gender | {gender var}
-[+] Save info to a List of Dictionaries
-[-] Convert from Dictionary to SQL file
-[+] Scrape the first 100 available search results
-    > Build the code to fetch the first 100 search results.
-    > Write functions that allow you to specify the gender, category, and amount of results as arguments
-[+] Generalize your code to allow searching for different gender and category
-[+] Pick out information about the URL, gender, and category
-[+] Save the results to a file
-[+] Build web-scraping models using Python.
-[-] Gather data from multiple sources and pull it into a SQL database.
-
-'''
