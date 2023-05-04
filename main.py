@@ -1,14 +1,12 @@
 '''
 Lagrange12 Web Scraper
 Author: Robert Woodhouse
-Created: 25/01/2023
-Modified: 18/02/2023
+Modified: 04/05/2023
 '''
 
 from selenium import webdriver
 from bs4 import BeautifulSoup
 import pandas
-import sqlite3
 
 browser = webdriver.Chrome('/Applications/chromedriver_mac64/chromedriver')
 browser.delete_all_cookies()
@@ -16,13 +14,13 @@ gender = ("men/", "women/")
 category = ("new-arrivals", "clothing", "shoes", "bags", "accessories", "jewels", "objects")
 number_of_products = 0
 links = []
-#product_list = []
+
 
 def open_browser_soup(url):
     browser.get(url)
     return BeautifulSoup(browser.page_source, "html.parser")
 
-# Link Builder
+# URL Builder
 '''
 print("[0] Men | [1] Women \nEnter Gender: ")
 gender_input = input()
@@ -82,6 +80,6 @@ for link in links:
 df = pandas.DataFrame(data=product_dict)
 df.to_json('l12.json', indent=3, orient='records')
 df.to_csv('l12.csv', index=False)
-#df.to_sql(name='l12.sql', con=sqlite3.Connection)
+
 
 browser.close()
